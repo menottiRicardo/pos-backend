@@ -41,7 +41,12 @@ export class AuthService {
   }
 
   async loginUser(user: UserDocument) {
-    const payload = { username: user.username, _id: user._id, role: user.role };
+    const payload = {
+      username: user.username,
+      _id: user._id,
+      role: user.role,
+      tenantId: user.tenantId,
+    };
     const accessToken = this.jwtService.sign(payload);
     user = await this.UserModel.findByIdAndUpdate(
       user._id,
