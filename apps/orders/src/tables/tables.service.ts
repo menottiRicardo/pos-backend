@@ -1,19 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { PrismaService } from './prisma.service';
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
-export class OrdersService {
+export class TablesService {
   constructor(private prisma: PrismaService) {}
-  create(createTable: Prisma.OrderCreateInput) {
-    const newOrder = this.prisma.order.create({
-      data: createTable,
+  create(createTableDto: Prisma.TableCreateInput) {
+    const newTable = this.prisma.table.create({
+      data: createTableDto,
     });
-    return newOrder;
+    return newTable;
   }
 
   findAll(tenantId: string) {
-    return this.prisma.order.findMany({
+    return this.prisma.table.findMany({
       where: {
         tenantId: tenantId,
       },
@@ -21,19 +21,19 @@ export class OrdersService {
   }
 
   findOne(id: string) {
-    return this.prisma.order.findUnique({
+    return this.prisma.table.findUnique({
       where: {
         id,
       },
     });
   }
 
-  update(id: string, updateTable: Prisma.OrderUpdateInput) {
-    return this.prisma.order.update({
+  update(id: string, updateTableDto: Prisma.TableUpdateInput) {
+    return this.prisma.table.update({
       where: {
         id,
       },
-      data: updateTable,
+      data: updateTableDto,
     });
   }
 
