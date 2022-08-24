@@ -10,6 +10,7 @@ export type UserType = {
   name: string;
   username: string;
   tenantId: mongoose.Types.ObjectId;
+  accessToken: string;
 };
 
 export type UserDocument = UserType & Document;
@@ -40,6 +41,9 @@ export class User {
 
   @Prop({ required: false, ref: 'tenants', default: null })
   tenantId: mongoose.Types.ObjectId;
+
+  @Prop({ required: false })
+  accessToken: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

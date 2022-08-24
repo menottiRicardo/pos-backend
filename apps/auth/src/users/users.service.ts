@@ -7,7 +7,9 @@ import { User, UserDocument } from '../mongodb';
 export class UsersService {
   constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) {}
 
-  async findOneUser(filter: object): Promise<UserDocument> {
+  //TODO: give types here
+  async findOneUser(filter: any): Promise<UserDocument> {
+    delete filter.tenantId;
     return this.UserModel.findOne(filter);
   }
 }

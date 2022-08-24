@@ -39,11 +39,16 @@ export class AuthService {
     return registeredUser;
   }
 
-  loginUser(user: UserDocument) {
+  async loginUser(user: UserDocument) {
     const payload = { username: user.username, _id: user._id, role: user.role };
-    return {
-      user,
-      access_token: this.jwtService.sign(payload),
-    };
+    const accessToken = this.jwtService.sign(payload);
+    user = await this.UserModel.findByIdAndUpdate(
+      user._id,
+      {
+        accessToken,
+      },
+      { new: true },
+    );
+    return user;
   }
 }
