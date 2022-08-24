@@ -1,17 +1,20 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   Post,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthService } from './auth.service';
-import { RegisterUserDto } from './dto/auth.dto';
+import { CreateTenantDto, RegisterUserDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { UserDocument } from './mongodb';
-import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
@@ -33,7 +36,21 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async logout(@Request() req) {
     const user = req.user as UserDocument;
-    console.log('user is ', user);
     return this.authService.logoutUser(user);
+  }
+
+  @Post('register-tenant')
+  @UseInterceptors(FileInterceptor('tenant_logo'))
+  async registerTenant(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: CreateTenantDto,
+  ) {
+    if (body.createTenantSecret !== process.env.CREATE_TENANT_SECRET) {
+      throw new BadRequestException('Invalid create tenant secret');
+    }
+    if (!file) {
+      throw new BadRequestException('Missing tenant logo');
+    }
+    return this.authService.registerTenant(body, file);
   }
 }

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { RegisterUserDto } from './dto/auth.dto';
-import { User, UserDocument } from './mongodb';
+import { CreateTenantDto, RegisterUserDto } from './dto/auth.dto';
+import { Tenant, TenantDocument, User, UserDocument } from './mongodb';
 import { UsersService } from './users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -11,6 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService {
   constructor(
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
+    @InjectModel(Tenant.name) private TenantModel: Model<TenantDocument>,
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
@@ -60,5 +61,13 @@ export class AuthService {
     return {
       message: 'User Logged out success.',
     };
+  }
+
+  async registerTenant(body: CreateTenantDto, file: Express.Multer.File) {
+    if (file) {
+      //TODO: write a function to upload a file
+    }
+    const createdTenant = await this.TenantModel.create(body);
+    return createdTenant;
   }
 }

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from './mongodb';
+import { Tenant, TenantSchema, User, UserSchema } from './mongodb';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { LocalStrategy } from './strategies/local.strategy';
@@ -15,7 +15,10 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     ConfigModule.forRoot(),
     MongooseModule.forRoot(process.env.DB_URL),
     AuthModule,
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Tenant.name, schema: TenantSchema },
+    ]),
     UsersModule,
     JwtModule.register({
       secret: jwtConstants.secret,
