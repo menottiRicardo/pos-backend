@@ -30,6 +30,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       throw new BadRequestException('Tenant id is required');
     }
 
+    await this.authService.validateTenantId(tenantId);
+
     const user = await this.authService.validateUser(
       username,
       password,
