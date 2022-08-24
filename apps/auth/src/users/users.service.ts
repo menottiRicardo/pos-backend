@@ -9,7 +9,6 @@ export class UsersService {
 
   //TODO: give types here
   async findOneUser(filter: any): Promise<UserDocument> {
-    delete filter.tenantId;
     return this.UserModel.findOne(filter);
   }
 }

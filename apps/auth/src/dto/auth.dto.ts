@@ -5,11 +5,17 @@ export class LoginUserDto {
   username: string;
 
   @IsNotEmpty()
+  @IsString()
   password: string;
+
+  @IsNotEmpty()
+  @IsString()
+  tenantId: string;
 }
 
 export class RegisterUserDto extends LoginUserDto {
   @IsNotEmpty()
+  @IsString()
   name: string;
 }
 
