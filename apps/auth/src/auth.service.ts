@@ -51,4 +51,14 @@ export class AuthService {
     );
     return user;
   }
+
+  async logoutUser(user: UserDocument) {
+    await this.UserModel.updateOne(
+      { _id: user._id },
+      { $unset: { accessToken: 1 } },
+    );
+    return {
+      message: 'User Logged out success.',
+    };
+  }
 }
