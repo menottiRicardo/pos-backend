@@ -7,14 +7,17 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Prisma } from '@prisma/client';
 import { OrdersService } from './orders.service';
 
+@ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create Order' })
   create(@Body() createOrder: Prisma.OrderCreateInput) {
     return this.ordersService.create(createOrder);
   }

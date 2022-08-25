@@ -3,17 +3,16 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from 'apps/orders/src/prisma.service';
 
 @Injectable()
-export class ProductsService {
+export class CategoriesService {
   constructor(private prisma: PrismaService) {}
-  create(createProduct: Prisma.ProductCreateInput) {
-    const newProduct = this.prisma.product.create({
+  create(createProduct: Prisma.CategoryCreateInput) {
+    return this.prisma.category.create({
       data: createProduct,
     });
-    return newProduct;
   }
 
   findAll(tenantId: string) {
-    return this.prisma.product.findMany({
+    return this.prisma.category.findMany({
       where: {
         tenantId: tenantId,
       },
@@ -21,19 +20,19 @@ export class ProductsService {
   }
 
   findOne(id: string) {
-    return this.prisma.product.findUnique({
+    return this.prisma.category.findUnique({
       where: {
         id,
       },
     });
   }
 
-  update(id: string, updateProduct: Prisma.ProductUpdateInput) {
-    return this.prisma.product.update({
+  update(id: string, udpateCategory: Prisma.CategoryUpdateInput) {
+    return this.prisma.category.update({
       where: {
         id,
       },
-      data: updateProduct,
+      data: udpateCategory,
     });
   }
 
