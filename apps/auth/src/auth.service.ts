@@ -6,6 +6,7 @@ import { Tenant, TenantDocument, User, UserDocument } from './mongodb';
 import { UsersService } from './users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { S3Service } from './helper/s3.helper';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +15,7 @@ export class AuthService {
     @InjectModel(Tenant.name) private TenantModel: Model<TenantDocument>,
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly s3Service: S3Service,
   ) {}
 
   async validateUser(
@@ -43,8 +45,17 @@ export class AuthService {
     return tenant;
   }
 
-  async registerUser(registerUserInfo: RegisterUserDto) {
+  async registerUser(
+    registerUserInfo: RegisterUserDto & { photoUrl?: string },
+    file: Express.Multer.File,
+  ) {
     await this.validateTenantId(registerUserInfo.tenantId);
+    if (file) {
+      const data = await this.s3Service.uploadFile(file);
+      if (data?.Location) {
+        registerUserInfo.photoUrl = data.Location;
+      }
+    }
     const registeredUser = await this.UserModel.create(registerUserInfo);
     await this.TenantModel.updateOne(
       { _id: registeredUser.tenantId },
@@ -81,11 +92,25 @@ export class AuthService {
     };
   }
 
-  async registerTenant(body: CreateTenantDto, file: Express.Multer.File) {
+  async registerTenant(
+    body: CreateTenantDto & { photoUrl?: string; ownerPhotoUrl?: string },
+    file: Express.Multer.File,
+  ) {
     if (file) {
-      //TODO: write a function to upload a file
+      const data = await this.s3Service.uploadFile(file);
+      if (data?.Location) {
+        body.photoUrl = data.Location;
+      }
     }
     const createdTenant = await this.TenantModel.create(body);
+    const createOwnerPayload = {
+      username: body.ownerUsername,
+      password: body.ownerPassword,
+      name: body.ownerName,
+      tenantId: createdTenant._id,
+      role: 'owner',
+    };
+    await this.UserModel.create(createOwnerPayload);
     return createdTenant;
   }
 }

@@ -21,8 +21,12 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  registerUser(@Body() registerUserInfo: RegisterUserDto) {
-    return this.authService.registerUser(registerUserInfo);
+  @UseInterceptors(FileInterceptor('user_image'))
+  registerUser(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() registerUserInfo: RegisterUserDto,
+  ) {
+    return this.authService.registerUser(registerUserInfo, file);
   }
 
   @Post('login')

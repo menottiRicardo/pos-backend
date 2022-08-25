@@ -27,4 +27,16 @@ export class CreateTenantDto {
   @IsNotEmpty()
   @IsString()
   createTenantSecret: string;
+
+  @IsNotEmpty()
+  @IsString()
+  ownerUsername: string;
+
+  @IsNotEmpty()
+  @IsString()
+  ownerPassword: string;
+
+  @IsNotEmpty()
+  @IsString()
+  ownerName: string;
 }
