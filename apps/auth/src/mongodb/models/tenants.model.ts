@@ -18,10 +18,10 @@ export class Tenant {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: false })
   photoUrl: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false, default: 0 })
   registerUsers: number;
 }
 
