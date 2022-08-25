@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   Request,
   UploadedFile,
   UseGuards,
@@ -56,5 +57,10 @@ export class AuthController {
       throw new BadRequestException('Missing tenant logo');
     }
     return this.authService.registerTenant(body, file);
+  }
+
+  @Get('tenants')
+  async getTenants(@Query('name') name: string) {
+    return this.authService.getTenants(name);
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Query } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateTenantDto, RegisterUserDto } from './dto/auth.dto';
@@ -112,5 +112,15 @@ export class AuthService {
     };
     await this.UserModel.create(createOwnerPayload);
     return createdTenant;
+  }
+
+  async getTenants(name: string) {
+    const findTenantsPayload = {};
+    if (name) {
+      findTenantsPayload['name'] = { $regex: name, $options: 'ig' };
+    }
+    return this.TenantModel.find(findTenantsPayload)
+      .sort({ registerUsers: -1 })
+      .limit(100);
   }
 }
