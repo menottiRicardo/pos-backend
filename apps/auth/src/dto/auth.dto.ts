@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class LoginUserDto {
   @IsNotEmpty()
@@ -39,4 +39,14 @@ export class CreateTenantDto {
   @IsNotEmpty()
   @IsString()
   ownerName: string;
+}
+
+export class ForgotPasswordDto {
+  @IsNotEmpty()
+  @IsString()
+  userId: string;
+
+  @IsNotEmpty()
+  @IsString()
+  password: string;
 }

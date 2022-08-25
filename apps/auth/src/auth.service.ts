@@ -88,6 +88,19 @@ export class AuthService {
     return updatedUser;
   }
 
+  async forgotPassword(userId: string, password: string) {
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    await this.UserModel.updateOne(
+      { _id: userId },
+      {
+        password: hashedPassword,
+      },
+    );
+    return {
+      message: 'Password reset success.',
+    };
+  }
+
   async loginUser(user: UserDocument) {
     const payload = {
       username: user.username,

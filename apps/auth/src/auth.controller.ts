@@ -7,6 +7,7 @@ import {
   Post,
   Query,
   Req,
+  UnauthorizedException,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -14,14 +15,22 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
-import { CreateTenantDto, RegisterUserDto } from './dto/auth.dto';
+import {
+  CreateTenantDto,
+  ForgotPasswordDto,
+  RegisterUserDto,
+} from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { UserDocument } from './mongodb';
+import { UsersService } from './users/users.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @Post('register')
   @UseInterceptors(FileInterceptor('userImage'))
@@ -44,6 +53,26 @@ export class AuthController {
   async logout(@Req() req) {
     const user = req.user as UserDocument;
     return this.authService.logoutUser(user);
+  }
+
+  @Post('forgot-password')
+  @UseGuards(JwtAuthGuard)
+  async forgotPassword(
+    @Req() req: Request & { user: UserDocument },
+    @Body() body: ForgotPasswordDto,
+  ) {
+    const admin = req.user as UserDocument;
+
+    if (admin.role !== 'admin') {
+      throw new UnauthorizedException();
+    }
+
+    const user = await this.usersService.findOneUser({ _id: body.userId });
+
+    if (user.tenantId.toString() !== admin.tenantId.toString()) {
+      throw new UnauthorizedException();
+    }
+    return this.authService.forgotPassword(user?._id.toString(), body.password);
   }
 
   @Patch('update-profile')

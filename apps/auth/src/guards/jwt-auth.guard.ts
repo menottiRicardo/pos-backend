@@ -39,6 +39,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
     const user = await this.userService.findOneUser(findQuery);
 
+    if (!user) {
+      return false;
+    }
+
     if (user.accessToken !== bearerToken) {
       return false;
     }
