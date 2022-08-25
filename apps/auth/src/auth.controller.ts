@@ -3,14 +3,16 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
   Query,
-  Request,
+  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { CreateTenantDto, RegisterUserDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -32,16 +34,42 @@ export class AuthController {
 
   @Post('login')
   @UseGuards(LocalAuthGuard)
-  async login(@Request() req) {
+  async login(@Req() req) {
     const user = req.user as UserDocument;
     return this.authService.loginUser(user);
   }
 
   @Get('logout')
   @UseGuards(JwtAuthGuard)
-  async logout(@Request() req) {
+  async logout(@Req() req) {
     const user = req.user as UserDocument;
     return this.authService.logoutUser(user);
+  }
+
+  @Patch('update-profile')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('userImage'))
+  updateProfile(
+    @Req() req: Request & { user: UserDocument },
+    @UploadedFile() file: Express.Multer.File,
+    @Body() updateUserInfo: { [key: string]: string },
+  ) {
+    const allowedUpdateKeys = ['name'];
+    const updateKeys = Object.keys(updateUserInfo);
+    if (updateKeys.length === 0) {
+      throw new BadRequestException('Missing update fields');
+    }
+
+    for (const key of updateKeys) {
+      if (allowedUpdateKeys.includes(key)) {
+        if (!allowedUpdateKeys.includes(key)) {
+          throw new BadRequestException(`Invalid update field: ${key}`);
+        }
+      }
+    }
+
+    const user = req.user as UserDocument;
+    return this.authService.updateProfile(updateUserInfo, file, user._id);
   }
 
   @Post('register-tenant')

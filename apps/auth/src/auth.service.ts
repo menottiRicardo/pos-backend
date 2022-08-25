@@ -64,6 +64,30 @@ export class AuthService {
     return registeredUser;
   }
 
+  async updateProfile(
+    updateUserInfo: any,
+    file: Express.Multer.File,
+    userID: string,
+  ) {
+    const updatePayload = {
+      ...updateUserInfo,
+    };
+    if (file) {
+      const data = await this.s3Service.uploadFile(file);
+      if (data?.Location) {
+        updatePayload['photoUrl'] = data.Location;
+      }
+    }
+    const updatedUser = await this.UserModel.findByIdAndUpdate(
+      userID,
+      updatePayload,
+      {
+        new: true,
+      },
+    );
+    return updatedUser;
+  }
+
   async loginUser(user: UserDocument) {
     const payload = {
       username: user.username,
