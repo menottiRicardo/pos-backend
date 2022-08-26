@@ -6,16 +6,21 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { TablesService } from './tables.service';
 import { Prisma } from '@prisma/client';
+import { JwtAuthGuard } from 'libs/common/src/auth/jwt-auth.guard';
 
 @Controller('tables')
 export class TablesController {
   constructor(private readonly tablesService: TablesService) {}
 
   @Post()
-  create(@Body() createTableDto: Prisma.TableCreateInput) {
+  @UseGuards(JwtAuthGuard)
+  create(@Body() createTableDto: Prisma.TableCreateInput, @Req() req: any) {
+    console.log(req);
     return this.tablesService.create(createTableDto);
   }
 
